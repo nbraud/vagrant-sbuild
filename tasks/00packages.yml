@@ -1,0 +1,26 @@
+---
+# tasks file for nbraud.dotfiles
+- name: Install required packages
+  apt: name={{item}} state=installed
+  become: yes
+  with_items:
+    - debian-keyring
+    - direnv
+    - git
+    - gnupg2
+    - stow
+    - zsh
+  when: "{{ dotfiles__install_packages }}"
+
+- name: Install extra packages
+  apt: name={{item}} state=installed
+  become: yes
+  with_items:
+    - command-not-found
+    - htop
+    - man-db
+    - manpages
+    - mosh
+    - tig
+    - tmux
+  when: "{{ dotfiles__install_extra_packages }}"
