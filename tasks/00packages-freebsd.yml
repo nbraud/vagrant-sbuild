@@ -1,0 +1,21 @@
+---
+- name: Install required packages
+  pkgng: name={{item}} state=present
+  become: yes
+  with_items:
+    - direnv
+    - git
+    - gnupg
+    - stow
+    - zsh
+  when: "{{ dotfiles__install_packages }}"
+
+- name: Install extra packages
+  pkgng: name={{item}} state=present
+  become: yes
+  with_items:
+    - htop
+    - mosh
+    - tig
+    - tmux
+  when: "{{ dotfiles__install_extra_packages }}"

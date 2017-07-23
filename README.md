@@ -9,7 +9,8 @@ Requirements
 
 Ansible 2.x is required.
 
-Currently, this only supports Debian systems, but FreeBSD support should happen soon-ish.
+- Debian and Ubuntu systems are supported (though Ubuntu is untested).
+- FreeBSD is supported starting with release 9.1, assuming pkgng is set up.
 
 
 Role Variables
