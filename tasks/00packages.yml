@@ -1,0 +1,17 @@
+---
+- name: Install required packages
+  apt: name={{item}} state=present
+  become: yes
+  with_items:
+    - build-essential
+    - debian-keyring
+    - debhelper
+    - dh-ocaml
+    - devscripts
+    - dpkg-dev-el
+    - liburi-perl
+    - git
+    - git-buildpackage
+    - gnupg2
+    - reportbug
+

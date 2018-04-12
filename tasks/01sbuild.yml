@@ -1,0 +1,99 @@
+---
+- block:
+    - name: Install debootstrap, fakeroot, sbuild, and schroot
+      apt: name={{ item }} state=present
+      with_items: [ debootstrap, fakeroot, sbuild, schroot ]
+
+    - name: Create ZFS deb dataset
+      zfs:
+        name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}"
+        state: present
+        extra_zfs_properties:
+          compression: lz4
+          mountpoint: "{{ debian__zfs_path }}"
+
+    - name: Create ZFS datasets
+      zfs:
+        name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/{{ item }}"
+        state: present
+      with_items: [ buildarea, schroot ]
+
+    - name: Configure sbuild with extra repositories
+      lineinfile:
+        path: /etc/sbuild/sbuild.conf
+        regexp: '^#?\$extra_repositories'
+        line: $extra_repositories = [ 'deb[trusted=yes] {{ debian__zfs_path }}/buildarea ./' ];
+        insertbefore: '^1;'
+
+
+    - name: Create ZFS datasets for sbuild
+      zfs:
+        name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/schroot/{{ item.suite }}"
+        state: present
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item.suite }}"
+
+    - name: Set permissions on the build area
+      file:
+        path: "{{ debian__zfs_path }}/buildarea"
+        mode: 0770
+        owner: root
+        group: sbuild
+
+    - name: Setup systemd-tmpfiles for schroot overlays
+      copy:
+        dest: /etc/tmpfiles.d/schroot.conf
+        content: >-
+          # File managed by Ansible. Do not edit manually
+
+          #Type Path                     Mode UID  GID  Age Argument
+          d     /var/run/schroot         0755 root root 10d -
+          d     /var/run/schroot/overlay 0700 root root  1d -
+
+
+      register: tmpfiles
+
+    - name: Activate systemd-tmpfiles
+      command: systemd-tmpfiles --create /etc/tmpfiles.d/schroot.conf
+      when: tmpfiles.changed
+
+    - name: Setup sbuild environments
+      command: >-
+        debootstrap --variant=buildd
+                    --include=fakeroot,build-essential
+                    {{ item.suite }}
+                    {{ debian__zfs_path }}/schroot/{{ item.suite }}
+                    https://deb.debian.org/debian
+      args:
+        creates: "{{ debian__zfs_path }}/schroot/{{ item.suite }}/bin"
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item.suite }}"
+
+    - name: Generate schroot configuration
+      copy:
+        dest: /etc/schroot/chroot.d/sbuild.conf
+        content: |-
+          # File managed by Ansible. Do not edit manually
+          {% for chroot in debian__schroots %}
+          [{{ chroot.suite }}-amd64-sbuild]
+          description=Debian {{ chroot.suite }}/amd64 autobuilder
+          groups=root,sbuild
+          root-groups=root
+          profile=sbuild
+          type=directory
+          directory={{ debian__zfs_path }}/schroot/{{ chroot.suite }}
+          union-type=overlay
+          union-overlay-directory=/var/run/schroot/overlay
+          aliases={{ chroot.aliases | join(',') }}
+          {% endfor %}
+
+
+    - name: Make schroot use the host's getent databases
+      lineinfile:
+        path: /etc/schroot/sbuild/copyfiles
+        line: /etc/{{ item }}
+      with_items: [ group, passwd ]
+
+  become: yes
