@@ -14,8 +14,12 @@
   pkgng: name={{item}} state=present
   become: yes
   with_items:
+    - emacs-nox
     - htop
+    - ipcalc
+    - py36-httpie
     - mosh
+    - mtr-nox11
     - tig
     - tmux
   when: "{{ dotfiles__install_extra_packages }}"

@@ -17,10 +17,16 @@
   become: yes
   with_items:
     - command-not-found
+    - emacs
     - htop
+    - httpie
+    - ipcalc
     - man-db
     - manpages
     - mosh
+    - mtr-tiny
+    - net-tools
+    - qalc
     - tig
     - tmux
   when: "{{ dotfiles__install_extra_packages }}"
