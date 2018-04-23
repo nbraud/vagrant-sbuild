@@ -4,14 +4,18 @@
   become: yes
   with_items:
     - build-essential
-    - debian-keyring
     - debhelper
-    - dh-ocaml
+    - debian-keyring
     - devscripts
+    - dh-ocaml
     - dpkg-dev-el
-    - liburi-perl
     - git
     - git-buildpackage
     - gnupg2
+    - libdistro-info-perl
+    - liburi-perl
+    - libwww-perl
+    - lintian
+    - pristine-tar
     - reportbug
 
