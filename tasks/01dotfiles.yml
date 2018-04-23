@@ -49,5 +49,5 @@
 
 - name: Set shell to ZSH
   user:
-    name: "{{ ansible_user }}"
+    name: "{{ ansible_env.USER }}"
     shell: /usr/bin/zsh
