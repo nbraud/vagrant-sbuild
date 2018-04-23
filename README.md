@@ -19,6 +19,7 @@ Role Variables
 - `dotfiles__install_packages`: Install packages that are required by the dotfiles.
 - `dotfiles__install_extra_packages`: Extra goodies I like to have.
   By default, implies `dotfiles__install_packages`.
+- `dotfiles__verify_signature`: Enforce signature verification on the dotfiles.
 
 
 Example Playbook
