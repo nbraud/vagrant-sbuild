@@ -4,27 +4,13 @@
       apt: name={{ item }} state=present
       with_items: [ debootstrap, fakeroot, sbuild, schroot ]
 
-    - name: Create ZFS deb dataset
-      zfs:
-        name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}"
-        state: present
-        extra_zfs_properties:
-          compression: lz4
-          mountpoint: "{{ debian__zfs_path }}"
-
-    - name: Create ZFS datasets
-      zfs:
-        name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/{{ item }}"
-        state: present
-      with_items: [ buildarea, schroot ]
-
     - name: Configure sbuild with extra repositories
       lineinfile:
         path: /etc/sbuild/sbuild.conf
         regexp: '^#?\$extra_repositories'
-        line: $extra_repositories = [ 'deb[trusted=yes] {{ debian__zfs_path }}/buildarea ./' ];
+        line: >
+          $extra_repositories = [ 'deb [trusted=yes] file://{{ debian__zfs_path }}/buildarea ./' ];
         insertbefore: '^1;'
-
 
     - name: Create ZFS datasets for sbuild
       zfs:

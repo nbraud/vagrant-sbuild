@@ -1,3 +1,4 @@
 ---
 - import_tasks: 00packages.yml
-- import_tasks: 01sbuild.yml
+- import_tasks: 01zfs.yml
+- import_tasks: 03sbuild.yml
