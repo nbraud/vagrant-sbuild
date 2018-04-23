@@ -12,6 +12,16 @@
           $extra_repositories = [ 'deb [trusted=yes] file://{{ debian__zfs_path }}/buildarea ./' ];
         insertbefore: '^1;'
 
+    - name: Configure files copied from the host
+      lineinfile:
+        path: /etc/schroot/sbuild/copyfiles
+        line: "{{ item }}"
+      loop:
+        - /etc/group
+        - /etc/passwd
+        - /etc/hosts
+        - /etc/resolv.conf
+
     - name: Create ZFS datasets for sbuild
       zfs:
         name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/schroot/{{ item.suite }}"
@@ -23,7 +33,7 @@
     - name: Set permissions on the build area
       file:
         path: "{{ debian__zfs_path }}/buildarea"
-        mode: 0770
+        mode: 0775
         owner: root
         group: sbuild
 
@@ -66,7 +76,7 @@
           [{{ chroot.suite }}-amd64-sbuild]
           description=Debian {{ chroot.suite }}/amd64 autobuilder
           groups=root,sbuild
-          root-groups=root
+          root-groups=root,sbuild
           profile=sbuild
           type=directory
           directory={{ debian__zfs_path }}/schroot/{{ chroot.suite }}
