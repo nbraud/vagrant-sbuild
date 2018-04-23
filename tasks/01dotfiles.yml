@@ -45,7 +45,6 @@
   command: stow -R debian emacs git gnupg zsh
   args:
     chdir: /home/{{ ansible_user }}/.dotfiles
-  when: dotfiles.changed
 
 - name: Set shell to ZSH
   user:
