@@ -27,6 +27,7 @@
     repo: https://github.com/nbraud/.dotfiles
     dest: "{{ ansible_env.HOME }}/.dotfiles"
     update: no
+    recursive: yes
     verify_commit: "{{ dotfiles__verify_signature }}"
   register: dotfiles
 
