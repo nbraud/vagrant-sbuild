@@ -1,4 +1,5 @@
 ---
 - import_tasks: 00packages.yml
 - import_tasks: 01zfs.yml
+- import_tasks: 02aptcacher.yml
 - import_tasks: 03sbuild.yml

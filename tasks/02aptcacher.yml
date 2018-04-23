@@ -1,0 +1,31 @@
+---
+- block:
+    - name: Install apt-cacher-ng
+      apt: name=apt-cacher-ng state=present
+
+    - name: Set permissions on the cache directory
+      file:
+        path: "{{ debian__zfs_path }}/cache"
+        owner: apt-cacher-ng
+        group: apt-cacher-ng
+        mode:  0755
+
+    - name: Configure apt-cacher-ng
+      template:
+        dest: /etc/apt-cacher-ng/acng.conf
+        src: acng.conf.j2
+      register: acng_conf
+
+    - name: Configure apt-cacher-ng Debian backend
+      copy:
+        dest: /etc/apt-cacher-ng/backends_debian
+        content: |
+          https://debian.ffgraz.net/debian
+          https://deb.debian.org/debian
+      register: acng_deb
+
+    - name: Restart apt-cacher-ng
+      service: name=apt-cacher-ng state=restarted
+      when: acng_conf.changed or acng_deb.changed
+
+  become: yes

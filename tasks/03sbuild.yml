@@ -70,7 +70,7 @@
                     --include=fakeroot,build-essential
                     {{ item.suite }}
                     {{ debian__zfs_path }}/schroot/{{ item.suite }}
-                    https://deb.debian.org/debian
+                    http://localhost:3142/debian
       args:
         creates: "{{ debian__zfs_path }}/schroot/{{ item.suite }}/bin"
       with_items: "{{ debian__schroots }}"
