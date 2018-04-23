@@ -12,6 +12,16 @@
           $extra_repositories = [ 'deb [trusted=yes] file://{{ debian__zfs_path }}/buildarea ./' ];
         insertbefore: '^1;'
 
+    - name: Configure in-chroot mounts
+      copy:
+        dest: /etc/schroot/sbuild/fstab
+        content: >-
+          # <file system> <mount point> <type>  <options> <dump> <pass>
+          devpts          /dev/pts      devpts  defaults  0      0
+          tmpfs           /dev/shm      tmpfs   defaults  0      0
+
+          {{ debian__zfs_path }}/buildarea {{ debian__zfs_path }}/buildarea none ro,bind 0 0
+
     - name: Configure files copied from the host
       lineinfile:
         path: /etc/schroot/sbuild/copyfiles
