@@ -25,7 +25,7 @@
 - name: Clone dotfiles
   git:
     repo: https://github.com/nbraud/.dotfiles
-    dest: /home/{{ ansible_user }}/.dotfiles
+    dest: "{{ ansible_env.HOME }}/.dotfiles"
     update: no
     verify_commit: yes
   register: dotfiles
@@ -36,7 +36,7 @@
 
 - name: Create required directories
   file:
-    path: /home/{{ ansible_user }}/.{{ item }}
+    path: "{{ ansible_env.HOME }}/.{{ item }}"
     state: directory
     mode: '0700'
   with_items: [ 'cache', 'config', 'local/bin', 'local/share' ]
