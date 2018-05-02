@@ -11,11 +11,14 @@
     - dpkg-dev-el
     - git
     - git-buildpackage
+    - git-dpm
     - gnupg2
     - libdistro-info-perl
     - liburi-perl
     - libwww-perl
     - lintian
+    - piuparts
+    - pkg-perl-tools
     - pristine-tar
     - reportbug
 
