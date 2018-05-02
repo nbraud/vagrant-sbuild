@@ -1,7 +1,7 @@
 debian__zpool_name:  "{{ ansible_hostname }}"
 debian__zfs_dataset: deb
 debian__zfs_path:  /opt/deb
-
+debian__overlay_path: /var/lib/schroot/union/overlay
 debian__schroots:
   - suite: sid
     aliases: [ unstable-amd64-sbuild ]

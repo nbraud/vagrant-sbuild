@@ -4,34 +4,6 @@
       apt: name={{ item }} state=present
       with_items: [ debootstrap, fakeroot, sbuild, schroot ]
 
-    - name: Configure sbuild with extra repositories
-      lineinfile:
-        path: /etc/sbuild/sbuild.conf
-        regexp: '^#?\$extra_repositories'
-        line: >
-          $extra_repositories = [ 'deb [trusted=yes] file://{{ debian__zfs_path }}/buildarea ./' ];
-        insertbefore: '^1;'
-
-    - name: Configure in-chroot mounts
-      copy:
-        dest: /etc/schroot/sbuild/fstab
-        content: >-
-          # <file system> <mount point> <type>  <options> <dump> <pass>
-          devpts          /dev/pts      devpts  defaults  0      0
-          tmpfs           /dev/shm      tmpfs   defaults  0      0
-
-          {{ debian__zfs_path }}/buildarea {{ debian__zfs_path }}/buildarea none ro,bind 0 0
-
-    - name: Configure files copied from the host
-      lineinfile:
-        path: /etc/schroot/sbuild/copyfiles
-        line: "{{ item }}"
-      loop:
-        - /etc/group
-        - /etc/passwd
-        - /etc/hosts
-        - /etc/resolv.conf
-
     - name: Create ZFS datasets for sbuild
       zfs:
         name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/schroot/{{ item.suite }}"
@@ -47,23 +19,6 @@
         owner: root
         group: sbuild
 
-    - name: Setup systemd-tmpfiles for schroot overlays
-      copy:
-        dest: /etc/tmpfiles.d/schroot.conf
-        content: >-
-          # File managed by Ansible. Do not edit manually
-
-          #Type Path                     Mode UID  GID  Age Argument
-          d     /var/run/schroot         0755 root root 10d -
-          d     /var/run/schroot/overlay 0700 root root  1d -
-
-
-      register: tmpfiles
-
-    - name: Activate systemd-tmpfiles
-      command: systemd-tmpfiles --create /etc/tmpfiles.d/schroot.conf
-      when: tmpfiles.changed
-
     - name: Setup sbuild environments
       command: >-
         debootstrap --variant=buildd
@@ -76,6 +31,55 @@
       with_items: "{{ debian__schroots }}"
       loop_control:
         label: "{{ item.suite }}"
+
+    # This is done as a separate step because, for some reason,
+    # debootstrap fails with --include=lintian
+    - name: Install lintian in sbuild environments
+      command: >-
+        chroot {{ debian__zfs_path }}/schroot/{{ item.suite }}
+          apt install -y lintian
+      args:
+        creates: "{{ debian__zfs_path }}/schroot/{{ item.suite }}/usr/bin/lintian"
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item.suite }}"
+
+    - name: Configure sbuild with extra repositories
+      lineinfile:
+        path: /etc/sbuild/sbuild.conf
+        regexp: '^#?\$extra_repositories'
+        line: >
+          $extra_repositories = [ 'deb [trusted=yes] file://{{ debian__zfs_path }}/buildarea ./' ];
+        insertbefore: '^1;'
+
+    - name: Configure in-chroot mounts
+      copy:
+        dest: /etc/schroot/sbuild/fstab
+        content: |-
+          # <file system> <mount point> <type>  <options> <dump> <pass>
+          devpts          /dev/pts      devpts  defaults  0      0
+          tmpfs           /dev/shm      tmpfs   defaults  0      0
+
+          {{ debian__zfs_path }}/buildarea {{ debian__zfs_path }}/buildarea none ro,bind 0 0
+
+    - name: Configure files copied from the host
+      lineinfile:
+        path: /etc/schroot/sbuild/copyfiles
+        line: "{{ item }}"
+      loop:
+        - /etc/group
+        - /etc/passwd
+        - /etc/hosts
+        - /etc/resolv.conf
+        - /proc/cpuinfo
+
+    - name: Create tmpfs for schroot overlays in /etc/fstab
+      mount:
+        state: mounted
+        fstype: tmpfs
+        src: tmpfs
+        opts: size=5G
+        path: "{{ debian__overlay_path }}"
 
     - name: Generate schroot configuration
       copy:
@@ -91,15 +95,8 @@
           type=directory
           directory={{ debian__zfs_path }}/schroot/{{ chroot.suite }}
           union-type=overlay
-          union-overlay-directory=/var/run/schroot/overlay
+          union-overlay-directory={{ debian__overlay_path }}
           aliases={{ chroot.aliases | join(',') }}
           {% endfor %}
-
-
-    - name: Make schroot use the host's getent databases
-      lineinfile:
-        path: /etc/schroot/sbuild/copyfiles
-        line: /etc/{{ item }}
-      with_items: [ group, passwd ]
 
   become: yes
