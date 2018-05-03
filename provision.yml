@@ -32,9 +32,10 @@
           deb http://security.debian.org/debian-security stretch/updates main
           deb-src http://security.debian.org/debian-security stretch/updates main
 
-    - name: Add user vagrant to group sbuild
+    - name: Add user vagrant to group sbuild, set shell
       become: yes
       user:
         name: vagrant
+        shell: /usr/bin/zsh
         groups: [sbuild]
         append: yes
