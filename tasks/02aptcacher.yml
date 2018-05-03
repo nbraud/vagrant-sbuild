@@ -14,7 +14,7 @@
       template:
         dest: /etc/apt-cacher-ng/acng.conf
         src: acng.conf.j2
-      register: acng_conf
+      notify: Restart apt-cacher-ng
 
     - name: Configure apt-cacher-ng Debian backend
       copy:
@@ -22,10 +22,8 @@
         content: |
           https://debian.ffgraz.net/debian
           https://deb.debian.org/debian
-      register: acng_deb
-
-    - name: Restart apt-cacher-ng
-      service: name=apt-cacher-ng state=restarted
-      when: acng_conf.changed or acng_deb.changed
+      notify: Restart apt-cacher-ng
 
   become: yes
+
+- meta: flush_handlers
