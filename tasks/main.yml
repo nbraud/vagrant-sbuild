@@ -1,5 +1,10 @@
 ---
 - import_tasks: 00packages.yml
+
+- import_tasks: 01dirs.yml
+  when: not debian__zfs
 - import_tasks: 01zfs.yml
+  when: debian__zfs
+
 - import_tasks: 02aptcacher.yml
 - import_tasks: 03sbuild.yml

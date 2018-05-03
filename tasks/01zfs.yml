@@ -5,7 +5,7 @@
     state: present
     extra_zfs_properties:
       compression: lz4
-      mountpoint: "{{ debian__zfs_path }}"
+      mountpoint: "{{ debian__path }}"
   become: yes
 
 - name: Create ZFS datasets
@@ -13,4 +13,13 @@
     name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/{{ item }}"
     state: present
   with_items: [ buildarea, schroot, cache ]
+  become: yes
+
+- name: Create ZFS datasets for schroots
+  zfs:
+    name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/schroot/{{ item.suite }}"
+    state: present
+  with_items: "{{ debian__schroots }}"
+  loop_control:
+    label: "{{ item.suite }}"
   become: yes

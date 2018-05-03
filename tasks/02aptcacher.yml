@@ -5,7 +5,7 @@
 
     - name: Set permissions on the cache directory
       file:
-        path: "{{ debian__zfs_path }}/cache"
+        path: "{{ debian__path }}/cache"
         owner: apt-cacher-ng
         group: apt-cacher-ng
         mode:  0755
