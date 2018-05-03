@@ -3,3 +3,7 @@
 dotfiles__install_extra_packages: False
 dotfiles__install_packages: "{{ dotfiles__install_extra_packages }}"
 dotfiles__verify_signature: True
+
+dotfiles__trusted_keys:
+  - 722B11B4F2DC80E1212B3F41B0739AAD91B7CDC0
+  - E44E9EA54B8E256AFB7349D3EC9D370872BC7A8C

@@ -19,7 +19,8 @@
       changed_when: False
 
 - name: Trust GPG key (ultimately)
-  shell: 'echo 722B11B4F2DC80E1212B3F41B0739AAD91B7CDC0:6: | gpg --import-ownertrust'
+  shell: 'echo {{ item }}:6: | gpg --import-ownertrust'
+  with_items: "{{ dotfiles__trusted_keys }}"
   when: dotfiles_gpg.changed
 
 - name: Clone dotfiles
@@ -40,14 +41,9 @@
     path: "{{ ansible_env.HOME }}/.{{ item }}"
     state: directory
     mode: '0700'
-  with_items: [ 'cache', 'config', 'local/bin', 'local/share' ]
+  with_items: [ 'cache', 'config', 'local/bin', 'local/share/data' ]
 
 - name: Symlink dotfiles in place
   command: stow -R debian emacs git gnupg zsh
   args:
     chdir: /home/{{ ansible_user }}/.dotfiles
-
-- name: Set shell to ZSH
-  user:
-    name: "{{ ansible_env.USER }}"
-    shell: /usr/bin/zsh
