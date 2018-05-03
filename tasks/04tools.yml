@@ -36,6 +36,9 @@
     # Do not autosign packages
     pgp_options: [ -us, -uc ]
 
+    # Pull packages from the buildarea
+    extra_repositories: [ 'deb [trusted=yes] file://{{ debian__path }}/buildarea ./' ]
+
     # Build options
     distribution: unstable
     purge_build_directory: always

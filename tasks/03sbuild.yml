@@ -32,14 +32,6 @@
       loop_control:
         label: "{{ item.suite }}"
 
-    - name: Configure sbuild with extra repositories
-      lineinfile:
-        path: /etc/sbuild/sbuild.conf
-        regexp: '^#?\$extra_repositories'
-        line: >
-          $extra_repositories = [ 'deb [trusted=yes] file://{{ debian__path }}/buildarea ./' ];
-        insertbefore: '^1;'
-
     - name: Configure in-chroot mounts
       copy:
         dest: /etc/schroot/sbuild/fstab
