@@ -1,9 +1,5 @@
 ---
 - block:
-    - name: Install debootstrap, fakeroot, sbuild, and schroot
-      apt: name={{ item }} state=present
-      with_items: [ debootstrap, fakeroot, sbuild, schroot ]
-
     - name: Set permissions on the build area
       file:
         path: "{{ debian__path }}/buildarea"

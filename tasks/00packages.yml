@@ -1,24 +1,30 @@
 ---
 - name: Install required packages
-  apt: name={{item}} state=present
+  apt:
+    state: present
+    name:
+      - apt-cacher-ng
+      - build-essential
+      - debhelper
+      - debian-keyring
+      - debootstrap
+      - devscripts
+      - dh-ocaml
+      - dpkg-dev-el
+      - fakeroot
+      - git
+      - git-buildpackage
+      - git-dpm
+      - gnupg2
+      - libdistro-info-perl
+      - liburi-perl
+      - libwww-perl
+      - lintian
+      - piuparts
+      - pkg-perl-tools
+      - pristine-tar
+      - reportbug
+      - sbuild
+      - schroot
   become: yes
-  with_items:
-    - build-essential
-    - debhelper
-    - debian-keyring
-    - devscripts
-    - dh-ocaml
-    - dpkg-dev-el
-    - git
-    - git-buildpackage
-    - git-dpm
-    - gnupg2
-    - libdistro-info-perl
-    - liburi-perl
-    - libwww-perl
-    - lintian
-    - piuparts
-    - pkg-perl-tools
-    - pristine-tar
-    - reportbug
 

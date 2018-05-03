@@ -1,8 +1,5 @@
 ---
 - block:
-    - name: Install apt-cacher-ng
-      apt: name=apt-cacher-ng state=present
-
     - name: Set permissions on the cache directory
       file:
         path: "{{ debian__path }}/cache"
