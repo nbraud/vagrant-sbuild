@@ -41,7 +41,7 @@
     path: "{{ ansible_env.HOME }}/.{{ item }}"
     state: directory
     mode: '0700'
-  with_items: [ 'cache', 'config', 'local/bin', 'local/share' ]
+  with_items: [ 'cache', 'config', 'local/bin', 'local/share/data' ]
 
 - name: Symlink dotfiles in place
   command: stow -R debian emacs git gnupg zsh
