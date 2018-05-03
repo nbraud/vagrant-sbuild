@@ -1,0 +1,8 @@
+- name: Create required directories
+  become: yes
+  file:
+    path: "{{ debian__path }}/{{ item }}"
+    state: directory
+  with_items:
+    - [ buildarea, schroot, cache ]
+    - "{{ debian__schroots | map(attribute='suite') | map('regex_replace', '^', 'schroot/') | list }}"

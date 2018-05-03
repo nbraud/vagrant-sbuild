@@ -1,0 +1,51 @@
+- name: "Tools : Configure git-buildpackage"
+  become: yes
+  lineinfile:
+    path: /etc/git-buildpackage/gbp.conf
+    line: "{{ item.key }} = {{ item.value }}"
+    regexp: "^#?{{ item.key }}"
+  with_dict:
+    builder: sbuild -v --no-clean-source
+    export-dir: "{{ debian__path }}/buildarea"
+    postbuild: "cd {{ debian__path }} && apt-ftparchive packages . > Packages"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: "Tools : Configure lintian"
+  become: yes
+  lineinfile:
+    path: /etc/lintianrc
+    line: "{{ item.key }} = {{ item.value }}"
+    regexp: "^#?{{ item.key }}"
+  with_dict:
+    LINTIAN_PROFILE: pkg-perl
+    display-info: yes
+    pedantic: yes
+    color: auto
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: "Tools : Configure sbuild"
+  become: yes
+  lineinfile:
+    path: /etc/sbuild/sbuild.conf
+    line: "${{ item.key }} = {{ item.value | tojson }};"
+    regexp: '^#?\${{ item.key }}'
+    insertbefore: '^1;'
+  with_dict:
+    # Do not autosign packages
+    pgp_options: [ -us, -uc ]
+
+    # Pull packages from the buildarea
+    extra_repositories: [ 'deb [trusted=yes] file://{{ debian__path }}/buildarea ./' ]
+
+    # Build options
+    distribution: unstable
+    purge_build_directory: always
+
+    # QA tools
+    ## Lintian
+    run_lintian: 1
+    lintian_opts: [ -i, -I ]
+  loop_control:
+    label: "{{ item.key }}"

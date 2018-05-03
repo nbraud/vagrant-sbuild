@@ -1,0 +1,82 @@
+---
+- block:
+    - name: "schroot : Set permissions on the build area"
+      file:
+        path: "{{ debian__path }}/buildarea"
+        mode: 0775
+        owner: root
+        group: sbuild
+
+    - name: "schroot : Setup environments"
+      command: >-
+        debootstrap --variant=buildd
+                    --include=fakeroot,build-essential
+                    {{ item.suite }}
+                    {{ debian__path }}/schroot/{{ item.suite }}
+                    http://localhost:3142/debian
+      args:
+        creates: "{{ debian__path }}/schroot/{{ item.suite }}/bin"
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item.suite }}"
+
+    - name: "schroot : Configure mounts"
+      copy:
+        dest: /etc/schroot/sbuild/fstab
+        content: |-
+          # <file system> <mount point> <type>  <options> <dump> <pass>
+          devpts          /dev/pts      devpts  defaults  0      0
+          tmpfs           /dev/shm      tmpfs   defaults  0      0
+
+          {{ debian__path }}/buildarea {{ debian__path }}/buildarea none ro,bind 0 0
+
+    - name: "schroot : Configure files copied from the host"
+      lineinfile:
+        path: /etc/schroot/sbuild/copyfiles
+        line: "{{ item }}"
+      loop:
+        - /etc/group
+        - /etc/passwd
+        - /etc/hosts
+        - /etc/resolv.conf
+        - /proc/cpuinfo
+
+    - name: "schroot : Create tmpfs for overlays"
+      mount:
+        state: mounted
+        fstype: tmpfs
+        src: tmpfs
+        opts: size=5G
+        path: "{{ debian__overlay_path }}"
+
+    - name: "schroot : Template chroot declarations"
+      copy:
+        dest: /etc/schroot/chroot.d/sbuild.conf
+        content: |-
+          # File managed by Ansible. Do not edit manually
+          {% for chroot in debian__schroots %}
+          [{{ chroot.suite }}-amd64-sbuild]
+          description=Debian {{ chroot.suite }}/amd64 autobuilder
+          groups=root,sbuild
+          root-groups=root,sbuild
+          profile=sbuild
+          type=directory
+          directory={{ debian__path }}/schroot/{{ chroot.suite }}
+          union-type=overlay
+          union-overlay-directory={{ debian__overlay_path }}
+          aliases={{ chroot.aliases | join(',') }}
+          {% endfor %}
+
+    # This is done as a separate step because, for some reason,
+    # debootstrap fails with --include=lintian
+    - name: "schroot : Install lintian in environments"
+      command: >-
+        schroot -c source:sid-amd64-sbuild --directory / --user root --
+          apt install -y lintian
+      args:
+        creates: "{{ debian__path }}/schroot/{{ item.suite }}/usr/bin/lintian"
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item.suite }}"
+
+  become: yes
