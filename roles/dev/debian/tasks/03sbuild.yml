@@ -3,9 +3,16 @@
     - name: "schroot : Set permissions on the build area"
       file:
         path: "{{ debian__path }}/buildarea"
-        mode: 0775
+        mode: 02775
         owner: root
         group: sbuild
+
+    - name: "schroot : Make sure buildarea/Packages exists"
+      copy:
+        dest: "{{ debian__path }}/buildarea/Packages"
+        content: ''
+        mode: 0664
+        force: no
 
     - name: "schroot : Setup environments"
       command: >-

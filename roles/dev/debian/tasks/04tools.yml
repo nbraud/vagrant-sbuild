@@ -7,7 +7,7 @@
   with_dict:
     builder: sbuild -v --no-clean-source
     export-dir: "{{ debian__path }}/buildarea"
-    postbuild: "cd {{ debian__path }} && apt-ftparchive packages . > Packages"
+    postbuild: "cd {{ debian__path }}/buildarea && apt-ftparchive packages . > Packages"
   loop_control:
     label: "{{ item.key }}"
 
