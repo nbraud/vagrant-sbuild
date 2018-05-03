@@ -1,0 +1,5 @@
+---
+# defaults file for nbraud.dotfiles
+dotfiles__install_extra_packages: False
+dotfiles__install_packages: "{{ dotfiles__install_extra_packages }}"
+dotfiles__verify_signature: True

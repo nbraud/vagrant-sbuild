@@ -1,0 +1,9 @@
+---
+- include_tasks: "{{ item }}"
+  with_first_found:
+    - 00packages-{{ ansible_distribution | lower }}-{{ ansible_distribution_version }}.yml
+    - 00packages-{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}.yml
+    - 00packages-{{ ansible_distribution | lower }}.yml
+    - 00packages-fail.yml
+  when: dotfiles__install_packages or dotfiles__install_extra_packages
+- import_tasks: 01dotfiles.yml

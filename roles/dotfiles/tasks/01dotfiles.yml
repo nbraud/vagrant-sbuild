@@ -1,0 +1,53 @@
+---
+- block:
+    - name: Copy OpenPGP key
+      copy:
+        src: files/nbraud.asc
+        dest: /tmp/nbraud.asc
+      changed_when: False
+
+    - name: Import OpenPGP key
+      command: gpg --import /tmp/nbraud.asc
+      register: dotfiles_gpg
+      changed_when: "'unchanged: 1' not in dotfiles_gpg.stderr"
+
+  always:
+    - name: Delete temporary file
+      file:
+        path: /tmp/nbraud.asc
+        state: absent
+      changed_when: False
+
+- name: Trust GPG key (ultimately)
+  shell: 'echo 722B11B4F2DC80E1212B3F41B0739AAD91B7CDC0:6: | gpg --import-ownertrust'
+  when: dotfiles_gpg.changed
+
+- name: Clone dotfiles
+  git:
+    repo: https://github.com/nbraud/.dotfiles
+    dest: "{{ ansible_env.HOME }}/.dotfiles"
+    update: no
+    recursive: yes
+    verify_commit: "{{ dotfiles__verify_signature }}"
+  register: dotfiles
+
+- name: Remove GnuPG config
+  shell: rm -f ~/.gnupg/*.conf
+  when: dotfiles.before == 'null'
+
+- name: Create required directories
+  file:
+    path: "{{ ansible_env.HOME }}/.{{ item }}"
+    state: directory
+    mode: '0700'
+  with_items: [ 'cache', 'config', 'local/bin', 'local/share' ]
+
+- name: Symlink dotfiles in place
+  command: stow -R debian emacs git gnupg zsh
+  args:
+    chdir: /home/{{ ansible_user }}/.dotfiles
+
+- name: Set shell to ZSH
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/bin/zsh
