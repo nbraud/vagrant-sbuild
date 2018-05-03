@@ -1,0 +1,33 @@
+---
+- hosts: default
+  pre_tasks:
+    - name: Update the machine
+      become: yes
+      apt:
+        update_cache: yes
+        upgrade: yes
+        autoremove: yes
+
+  roles:
+    - name: dotfiles
+      vars:
+        dotfiles__install_extra_packages: yes
+
+    - dev/debian
+
+  tasks:
+    - name: Set hostname
+      become: yes
+      hostname:
+        name: debian-builds
+
+    - name: Use the local apt-cache
+      become: yes
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb http://localhost:3142/debian stretch main
+          deb-src http://localhost:3142/debian stretch main
+
+          deb http://security.debian.org/debian-security stretch/updates main
+          deb-src http://security.debian.org/debian-security stretch/updates main
