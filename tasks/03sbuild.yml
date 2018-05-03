@@ -20,18 +20,6 @@
       loop_control:
         label: "{{ item.suite }}"
 
-    # This is done as a separate step because, for some reason,
-    # debootstrap fails with --include=lintian
-    - name: "schroot : Install lintian in environments"
-      command: >-
-        chroot {{ debian__path }}/schroot/{{ item.suite }}
-          apt install -y lintian
-      args:
-        creates: "{{ debian__path }}/schroot/{{ item.suite }}/usr/bin/lintian"
-      with_items: "{{ debian__schroots }}"
-      loop_control:
-        label: "{{ item.suite }}"
-
     - name: "schroot : Configure mounts"
       copy:
         dest: /etc/schroot/sbuild/fstab
@@ -78,5 +66,17 @@
           union-overlay-directory={{ debian__overlay_path }}
           aliases={{ chroot.aliases | join(',') }}
           {% endfor %}
+
+    # This is done as a separate step because, for some reason,
+    # debootstrap fails with --include=lintian
+    - name: "schroot : Install lintian in environments"
+      command: >-
+        schroot -c source:sid-amd64-sbuild --directory / --user root --
+          apt install -y lintian
+      args:
+        creates: "{{ debian__path }}/schroot/{{ item.suite }}/usr/bin/lintian"
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item.suite }}"
 
   become: yes
