@@ -1,6 +1,11 @@
 ---
 - hosts: default
   pre_tasks:
+    - name: Set hostname
+      become: yes
+      hostname:
+        name: debian-builds
+
     - name: Update the machine
       become: yes
       apt:
@@ -16,11 +21,6 @@
     - dev/debian
 
   tasks:
-    - name: Set hostname
-      become: yes
-      hostname:
-        name: debian-builds
-
     - name: Use the local apt-cache
       become: yes
       copy:
