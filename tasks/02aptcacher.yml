@@ -20,7 +20,6 @@
       copy:
         dest: /etc/apt-cacher-ng/backends_debian
         content: |
-          https://debian.ffgraz.net/debian
           https://deb.debian.org/debian
       notify: Restart apt-cacher-ng
 
