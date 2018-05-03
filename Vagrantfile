@@ -13,4 +13,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "provision.yml"
   end
+
+  config.vm.post_up_message = <<~HEREDOC
+    Debian sbuild in-a-box, by nicoo
+    https://github.com/nbraud/vagrant-sbuild
+  HEREDOC
 end
