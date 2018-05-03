@@ -1,5 +1,5 @@
 ---
-- name: Create ZFS deb dataset
+- name: "ZFS : Create main dataset"
   zfs:
     name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}"
     state: present
@@ -8,14 +8,14 @@
       mountpoint: "{{ debian__path }}"
   become: yes
 
-- name: Create ZFS datasets
+- name: "ZFS : Create datasets"
   zfs:
     name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/{{ item }}"
     state: present
   with_items: [ buildarea, schroot, cache ]
   become: yes
 
-- name: Create ZFS datasets for schroots
+- name: "ZFS : Create datasets for schroots"
   zfs:
     name: "{{ debian__zpool_name }}/{{ debian__zfs_dataset }}/schroot/{{ item.suite }}"
     state: present

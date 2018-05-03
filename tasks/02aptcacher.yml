@@ -1,19 +1,19 @@
 ---
 - block:
-    - name: Set permissions on the cache directory
+    - name: "apt-cacher : Set permissions on the cache directory"
       file:
         path: "{{ debian__path }}/cache"
         owner: apt-cacher-ng
         group: apt-cacher-ng
         mode:  0755
 
-    - name: Configure apt-cacher-ng
+    - name: "apt-cacher : Template acng.conf"
       template:
         dest: /etc/apt-cacher-ng/acng.conf
         src: acng.conf.j2
       notify: Restart apt-cacher-ng
 
-    - name: Configure apt-cacher-ng Debian backend
+    - name: "apt-cacher : Setup Debian backend"
       copy:
         dest: /etc/apt-cacher-ng/backends_debian
         content: |
