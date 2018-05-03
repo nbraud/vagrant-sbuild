@@ -12,6 +12,7 @@
         dest: "{{ debian__path }}/buildarea/Packages"
         content: ''
         mode: 0664
+        group: sbuild
         force: no
 
     - name: "schroot : Setup environments"
