@@ -1,25 +1,27 @@
 ---
 - name: Install required packages
-  pkgng: name={{item}} state=present
+  when: dotfiles__install_packages
   become: yes
-  with_items:
-    - direnv
-    - git
-    - gnupg
-    - stow
-    - zsh
-  when: "{{ dotfiles__install_packages }}"
+  pkgng:
+    state: present
+    name:
+      - direnv
+      - git
+      - gnupg
+      - stow
+      - zsh
 
 - name: Install extra packages
-  pkgng: name={{item}} state=present
+  when: dotfiles__install_extra_packages
   become: yes
-  with_items:
-    - emacs-nox
-    - htop
-    - ipcalc
-    - py36-httpie
-    - mosh
-    - mtr-nox11
-    - tig
-    - tmux
-  when: "{{ dotfiles__install_extra_packages }}"
+  pkgng:
+    state: present
+    name:
+      - emacs-nox
+      - htop
+      - ipcalc
+      - py36-httpie
+      - mosh
+      - mtr-nox11
+      - tig
+      - tmux
