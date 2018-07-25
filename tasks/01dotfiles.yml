@@ -44,6 +44,6 @@
   with_items: [ 'cache', 'config', 'local/bin', 'local/share/data' ]
 
 - name: Symlink dotfiles in place
-  command: stow -R debian emacs git gnupg zsh
+  command: "{{ dotfiles__stow }} -R debian emacs git gnupg zsh"
   args:
     chdir: /home/{{ ansible_user }}/.dotfiles
