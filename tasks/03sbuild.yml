@@ -28,6 +28,17 @@
       loop_control:
         label: "{{ item.suite }}"
 
+    - name: "schroot : Setup sources.list"
+      with_items: "{{ debian__schroots }}"
+      copy:
+        dest: "{{ debian__path }}/schroot/{{ item.suite }}/etc/apt/sources.list"
+        content: |
+          deb     http://localhost:3142/debian {{ item.suite }} main
+          deb-src http://localhost:3142/debian {{ item.suite }} main
+
+      loop_control:
+        label: "{{ item.suite }}"
+
     - name: "schroot : Configure mounts"
       copy:
         dest: /etc/schroot/sbuild/fstab

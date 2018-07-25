@@ -9,6 +9,7 @@
       - debian-keyring
       - debootstrap
       - devscripts
+      - dose-extra
       - dpkg-dev-el
       - git
       - git-buildpackage
@@ -23,6 +24,7 @@
       - piuparts
       - pkg-perl-tools
       - pristine-tar
+      - ratt
       - reportbug
       - sbuild
       - schroot
