@@ -46,4 +46,4 @@
 - name: Symlink dotfiles in place
   command: "{{ dotfiles__stow }} -R debian emacs git gnupg zsh"
   args:
-    chdir: /home/{{ ansible_user }}/.dotfiles
+    chdir: "{{ ansible_env.HOME }}/.dotfiles"
