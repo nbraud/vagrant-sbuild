@@ -41,7 +41,15 @@
 
     # Build options
     distribution: unstable
-    purge_build_directory: always
+
+    # Avoid purging the build directory and dependencies,
+    # as they will be removed on session exit anyhow
+    purge_build_directory: never
+    purge_build_deps: never
+
+    # Purge all sessions by default, as failed builds
+    # will progressively consume all the memory.
+    purge_session: always
 
     # QA tools
     ## Lintian
