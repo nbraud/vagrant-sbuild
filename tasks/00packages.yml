@@ -5,6 +5,7 @@
     name:
       - apt-cacher-ng
       - build-essential
+      - check-all-the-things
       - debian-keyring
       - debootstrap
       - devscripts
@@ -13,10 +14,12 @@
       - git-buildpackage
       - git-dpm
       - gnupg2
+      - libconfig-model-dpkg-perl  # Provides scan-copyrights
       - libdistro-info-perl
       - liburi-perl
       - libwww-perl
       - lintian
+      - meld
       - piuparts
       - pkg-perl-tools
       - pristine-tar
