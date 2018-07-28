@@ -13,7 +13,7 @@ This is a ready-made VM for building Debian packages; it comes with:
 ## Prerequisites
 
 - `vagrant` is required to setup the VM environment, with whichever
-  virtualization software you like (I personally user VirtualBox).
+  virtualization software you like (I personally use VirtualBox).
 - `ansible` is used to configure the virtual machine.
 
 
@@ -84,11 +84,11 @@ _Note:_ This is not meant to be an exhaustive Vagrant tutorial.
 ## Details
 
 The `Vagrantfile` specifies the official `debian/contrib-stretch64` box as a
-base image; once imported, provisionning is done through an Ansible playbook
+base image; once imported, provisioning is done through an Ansible playbook
 which:
 
 0. sets the hostname to `debian-builds`;
-1. runs updates and autoremove packages;
+1. runs updates and automatically removes packages;
 2. securely fetches and install my dotfiles, along with favored packages,
    through my [dotfiles role](https://github.com/nbraud/ansible.dotfiles);
 3. sets up a Debian development environment, through my
