@@ -2,6 +2,7 @@
 # defaults file for nbraud.dotfiles
 dotfiles__install_extra_packages: False
 dotfiles__install_packages: "{{ dotfiles__install_extra_packages }}"
+dotfiles__stow: stow
 dotfiles__verify_signature: True
 
 dotfiles__trusted_keys:
