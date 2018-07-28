@@ -41,7 +41,7 @@ _Note:_ This is not meant to be an exhaustive Vagrant tutorial.
 - SSH into it:
 
         nicoo@neon $ vagrant ssh
-        nicoo@debian-builds $
+        vagrant@debian-builds $
 
 - Get shit done:
 
