@@ -83,8 +83,9 @@ _Note:_ This is not meant to be an exhaustive Vagrant tutorial.
 
 ## Details
 
-The `Vagrantfile` specifies the official `debian/stretch64` box as a base image;
-once imported, provisionning is done through an Ansible playbook which:
+The `Vagrantfile` specifies the official `debian/contrib-stretch64` box as a
+base image; once imported, provisionning is done through an Ansible playbook
+which:
 
 0. sets the hostname to `debian-builds`;
 1. runs updates and autoremove packages;
