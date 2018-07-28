@@ -44,6 +44,7 @@
         dest: /etc/schroot/sbuild/fstab
         content: |-
           # <file system> <mount point> <type>  <options> <dump> <pass>
+          /proc           /proc         none    ro,bind   0      0
           devpts          /dev/pts      devpts  defaults  0      0
           tmpfs           /dev/shm      tmpfs   defaults  0      0
 
