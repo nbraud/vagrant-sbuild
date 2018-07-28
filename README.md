@@ -10,6 +10,16 @@ This is a ready-made VM for building Debian packages; it comes with:
 [glorious dotfiles]: https://github.com/nbraud/.dotfiles
 
 
+## Prerequisites
+
+- `vagrant` is required to setup the VM environment, with whichever
+  virtualization software you like (I personally user VirtualBox).
+- `ansible` is used to configure the virtual machine.
+
+
+      sudo apt install ansible vagrant virtualbox
+
+
 ## How to use
 
 _Note:_ This is not meant to be an exhaustive Vagrant tutorial.
