@@ -8,6 +8,9 @@ debian__extra_pkgs: [ lintian ]
 debian__schroots:
   - suite: sid
     aliases: [ unstable-amd64-sbuild ]
+  - name: debcargo
+    suite: sid
+    extra_pkgs: [ cargo, dh-cargo ]
 # - suite: stretch
 #   aliases: [ stable, stretch-backports ]
 
