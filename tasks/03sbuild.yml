@@ -20,24 +20,24 @@
         debootstrap --variant=buildd
                     --include=fakeroot,build-essential
                     {{ item.suite }}
-                    {{ debian__path }}/schroot/{{ item.suite }}
+                    {{ debian__path }}/schroot/{{ item_name }}
                     http://localhost:3142/debian
       args:
-        creates: "{{ debian__path }}/schroot/{{ item.suite }}/bin"
+        creates: "{{ debian__path }}/schroot/{{ item_name }}/bin"
       with_items: "{{ debian__schroots }}"
       loop_control:
-        label: "{{ item.suite }}"
+        label: "{{ item_name }}"
 
     - name: "schroot : Setup sources.list"
       with_items: "{{ debian__schroots }}"
       copy:
-        dest: "{{ debian__path }}/schroot/{{ item.suite }}/etc/apt/sources.list"
+        dest: "{{ debian__path }}/schroot/{{ item_name }}/etc/apt/sources.list"
         content: |
           deb     http://localhost:3142/debian {{ item.suite }} main
           deb-src http://localhost:3142/debian {{ item.suite }} main
 
       loop_control:
-        label: "{{ item.suite }}"
+        label: "{{ item_name }}"
 
     - name: "schroot : Configure mounts"
       copy:
@@ -74,29 +74,30 @@
         dest: /etc/schroot/chroot.d/sbuild.conf
         content: |-
           # File managed by Ansible. Do not edit manually
-          {% for chroot in debian__schroots %}
-          [{{ chroot.suite }}-amd64-sbuild]
-          description=Debian {{ chroot.suite }}/amd64 autobuilder
+          {% for item in debian__schroots %}
+          [{{ item.name | default(item.suite) }}-amd64-sbuild]
+          description=Debian {{ item.suite }}/amd64 autobuilder
           groups=root,sbuild
           root-groups=root,sbuild
           profile=sbuild
           type=directory
-          directory={{ debian__path }}/schroot/{{ chroot.suite }}
+          directory={{ debian__path }}/schroot/{{ item.name | default(item.suite) }}
           union-type=overlay
           union-overlay-directory={{ debian__overlay_path }}
-          aliases={{ chroot.aliases | join(',') }}
+          {% if item.aliases is defined %}
+          aliases={{ item.aliases | join(',') }}
+          {% endif %}
           {% endfor %}
 
-    # This is done as a separate step because, for some reason,
-    # debootstrap fails with --include=lintian
-    - name: "schroot : Install lintian in environments"
+    - name: "schroot : Install extra packages in environments"
       command: >-
-        schroot -c source:sid-amd64-sbuild --directory / --user root --
-          apt install -y lintian
+        schroot -c source:{{ item_name }}-amd64-sbuild --directory / --user root --
+          apt install -y {{ item.extra_pkgs | default([]) | union(debian__extra_pkgs) | join(' ') }}
       args:
-        creates: "{{ debian__path }}/schroot/{{ item.suite }}/usr/bin/lintian"
+        # TODO: FIXME
+        creates: "{{ debian__path }}/schroot/{{ item_name }}/usr/bin/lintian"
       with_items: "{{ debian__schroots }}"
       loop_control:
-        label: "{{ item.suite }}"
+        label: "{{ item_name }}"
 
   become: yes

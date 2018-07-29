@@ -4,8 +4,13 @@ debian__zfs_dataset: deb
 
 debian__path:  /opt/deb
 debian__overlay_path: /var/lib/schroot/union/overlay
+debian__extra_pkgs: [ lintian ]
 debian__schroots:
   - suite: sid
     aliases: [ unstable-amd64-sbuild ]
 # - suite: stretch
 #   aliases: [ stable, stretch-backports ]
+
+
+# Dirty hack  :/
+item_name: "{{ item.name | default( item.suite) }}"
