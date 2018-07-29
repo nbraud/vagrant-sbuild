@@ -9,6 +9,7 @@
       - debian-keyring
       - debootstrap
       - devscripts
+      - dh-cargo
       - dose-extra
       - dpkg-dev-el
       - git
