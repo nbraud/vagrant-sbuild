@@ -89,6 +89,16 @@
           {% endif %}
           {% endfor %}
 
+    - name: "schroot : Update apt cache"
+      command: >-
+        schroot -c source:{{ item_name }}-amd64-sbuild --directory / --user root --
+          apt update
+      with_items: "{{ debian__schroots }}"
+      loop_control:
+        label: "{{ item_name }}"
+
+    # This is done as a separate step because, for some reason,
+    # debootstrap fails with --include=lintian
     - name: "schroot : Install extra packages in environments"
       command: >-
         schroot -c source:{{ item_name }}-amd64-sbuild --directory / --user root --
