@@ -39,3 +39,13 @@
         shell: /usr/bin/zsh
         groups: [sbuild]
         append: yes
+
+    - name: Install cargo
+      become: yes
+      apt:
+        name: cargo
+        state: present
+
+    - name: Install debcargo
+      become: no
+      command: cargo install debcargo
